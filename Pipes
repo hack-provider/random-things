@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pipe Animation</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: #101010;
+      color: white;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .pipe {
+      position: relative;
+      width: 400px;
+      height: 20px;
+      background: #444;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .pipe::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 400px;
+      height: 4px;
+      background: linear-gradient(to right, #00ff00, #00aaff);
+      border-radius: 2px;
+      transform: translateY(-50%);
+      z-index: 1;
+    }
+
+    .dot {
+      position: absolute;
+      top: 50%;
+      left: -20px;
+      width: 10px;
+      height: 10px;
+      background: #00ff00;
+      border-radius: 50%;
+      animation: move 2s linear infinite;
+      transform: translateY(-50%);
+      box-shadow: 0 0 6px #00ff00;
+    }
+
+    .dot:nth-child(2) {
+      animation-delay: 0.5s;
+    }
+
+    .dot:nth-child(3) {
+      animation-delay: 1s;
+    }
+
+    .dot:nth-child(4) {
+      animation-delay: 1.5s;
+    }
+
+    @keyframes move {
+      0% {
+        left: -20px;
+        opacity: 0;
+      }
+      20% {
+        opacity: 1;
+      }
+      100% {
+        left: 420px;
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="pipe">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+</body>
+</html>
