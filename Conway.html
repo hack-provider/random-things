@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game of Life - Customizable</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      background-color: #282c34;
+      color: white;
+      height: 100vh;
+    }
+
+    canvas {
+      border: 1px solid white;
+      margin: 20px 0;
+    }
+
+    button {
+      margin: 5px;
+      padding: 10px 15px;
+      border: none;
+      background-color: #61dafb;
+      color: black;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #21a1f1;
+    }
+  </style>
+</head>
+<body>
+  <h1>Conway's Game of Life</h1>
+  <canvas id="gameCanvas" width="500" height="500"></canvas>
+  <div>
+    <button id="startButton">Start</button>
+    <button id="pauseButton">Pause</button>
+    <button id="clearButton">Clear</button>
+    <button id="randomButton">Random</button>
+  </div>
+  <p>Click on the canvas to add or remove cells.</p>
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const resolution = 10; // Size of each cell
+    const COLS = canvas.width / resolution;
+    const ROWS = canvas.height / resolution;
+
+    let grid = buildGrid();
+    let running = false;
+
+    // Initialize the grid with empty (dead) cells
+    function buildGrid() {
+      return new Array(COLS).fill(null).map(() =>
+        new Array(ROWS).fill(null).map(() => 0)
+      );
+    }
+
+    // Render the grid on the canvas
+    function renderGrid() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let col = 0; col < COLS; col++) {
+        for (let row = 0; row < ROWS; row++) {
+          const cell = grid[col][row];
+          ctx.beginPath();
+          ctx.rect(col * resolution, row * resolution, resolution, resolution);
+          ctx.fillStyle = cell ? "white" : "black";
+          ctx.fill();
+          ctx.strokeStyle = "gray";
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Calculate the next generation of the grid
+    function nextGeneration(grid) {
+      const nextGen = grid.map(arr => [...arr]);
+
+      for (let col = 0; col < grid.length; col++) {
+        for (let row = 0; row < grid[col].length; row++) {
+          const cell = grid[col][row];
+          let numNeighbors = 0;
+          for (let i = -1; i < 2; i++) {
+            for (let j = -1; j < 2; j++) {
+              if (i === 0 && j === 0) continue;
+              const x = col + i;
+              const y = row + j;
+              if (x >= 0 && y >= 0 && x < COLS && y < ROWS) {
+                numNeighbors += grid[x][y];
+              }
+            }
+          }
+
+          // Apply the rules of Conway's Game of Life
+          if (cell === 1 && (numNeighbors < 2 || numNeighbors > 3)) {
+            nextGen[col][row] = 0;
+          } else if (cell === 0 && numNeighbors === 3) {
+            nextGen[col][row] = 1;
+          }
+        }
+      }
+
+      return nextGen;
+    }
+
+    // Update the grid and render the next generation
+    function update() {
+      grid = nextGeneration(grid);
+      renderGrid();
+      if (running) {
+        requestAnimationFrame(update);
+      }
+    }
+
+    // Handle user clicks on the canvas to toggle cells
+    canvas.addEventListener("click", (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.floor((event.clientX - rect.left) / resolution);
+      const y = Math.floor((event.clientY - rect.top) / resolution);
+      grid[x][y] = grid[x][y] ? 0 : 1; // Toggle the cell state
+      renderGrid();
+    });
+
+    // Start the game
+    document.getElementById("startButton").addEventListener("click", () => {
+      if (!running) {
+        running = true;
+        update();
+      }
+    });
+
+    // Pause the game
+    document.getElementById("pauseButton").addEventListener("click", () => {
+      running = false;
+    });
+
+    // Clear the grid
+    document.getElementById("clearButton").addEventListener("click", () => {
+      grid = buildGrid();
+      renderGrid();
+    });
+
+    // Populate the grid randomly
+    document.getElementById("randomButton").addEventListener("click", () => {
+      grid = buildGrid().map(arr => arr.map(() => Math.floor(Math.random() * 2)));
+      renderGrid();
+    });
+
+    // Initial rendering of the grid
+    renderGrid();
+  </script>
+</body>
+</html>
